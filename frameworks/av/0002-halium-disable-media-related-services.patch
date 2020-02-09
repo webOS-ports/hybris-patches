@@ -1,0 +1,47 @@
+From 322b203ffc1fb8d7f15f56111debce0dd57c752c Mon Sep 17 00:00:00 2001
+From: NeKit <nekit1000@gmail.com>
+Date: Sun, 9 Feb 2020 18:39:54 +0100
+Subject: [PATCH 2/2] (halium) disable media-related services
+
+Their functionality is provided by minimedia in droidmedia repo instead
+
+Change-Id: I32f470bec0e294a1299b6199a2f716fd64378283
+---
+ camera/cameraserver/cameraserver.rc | 2 +-
+ media/audioserver/audioserver.rc    | 2 +-
+ media/mediaserver/mediaserver.rc    | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/camera/cameraserver/cameraserver.rc b/camera/cameraserver/cameraserver.rc
+index a9aae0b..089b020 100644
+--- a/camera/cameraserver/cameraserver.rc
++++ b/camera/cameraserver/cameraserver.rc
+@@ -1,4 +1,4 @@
+-service cameraserver /system/bin/cameraserver
++service cameraserver /system/bin/cameraserver_HYBRIS_DISABLED
+     class main
+     user cameraserver
+     group audio camera input drmrpc
+diff --git a/media/audioserver/audioserver.rc b/media/audioserver/audioserver.rc
+index 75675a9..91def35 100644
+--- a/media/audioserver/audioserver.rc
++++ b/media/audioserver/audioserver.rc
+@@ -1,4 +1,4 @@
+-service audioserver /system/bin/audioserver
++service audioserver /system/bin/audioserver_HYBRIS_DISABLED
+     class core
+     user audioserver
+     # media gid needed for /dev/fm (radio) and for /data/misc/media (tee)
+diff --git a/media/mediaserver/mediaserver.rc b/media/mediaserver/mediaserver.rc
+index f6c325c..f462c9a 100644
+--- a/media/mediaserver/mediaserver.rc
++++ b/media/mediaserver/mediaserver.rc
+@@ -1,4 +1,4 @@
+-service media /system/bin/mediaserver
++service media /system/bin/mediaserver_HYBRIS_DISABLED
+     class main
+     user media
+     group audio camera inet net_bt net_bt_admin net_bw_acct drmrpc mediadrm
+-- 
+2.25.0
+

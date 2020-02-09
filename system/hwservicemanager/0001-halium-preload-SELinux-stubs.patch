@@ -1,0 +1,23 @@
+From 8d5cc2f612dba6cb6d35942e5e33104d9185ac64 Mon Sep 17 00:00:00 2001
+From: NeKit <nekit1000@gmail.com>
+Date: Sun, 9 Feb 2020 18:42:12 +0100
+Subject: [PATCH] (halium) preload SELinux stubs
+
+Change-Id: If76d9a6815119dfb75b699030e1b29af8378c0ee
+---
+ hwservicemanager.rc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/hwservicemanager.rc b/hwservicemanager.rc
+index 96fd5b0..16c0405 100644
+--- a/hwservicemanager.rc
++++ b/hwservicemanager.rc
+@@ -1,4 +1,5 @@
+ service hwservicemanager /system/bin/hwservicemanager
++    setenv LD_PRELOAD /system/lib64/libselinux_stubs.so
+     user system
+     disabled
+     group system readproc
+-- 
+2.25.0
+

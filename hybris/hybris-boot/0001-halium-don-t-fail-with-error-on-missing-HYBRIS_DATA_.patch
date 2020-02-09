@@ -1,0 +1,29 @@
+From 12b50a67dcca46e9b3ea5b5c20a1f5813b6c5d6a Mon Sep 17 00:00:00 2001
+From: NeKit <nekit1000@gmail.com>
+Date: Sun, 9 Feb 2020 19:37:44 +0100
+Subject: [PATCH] (halium) don't fail with error on missing HYBRIS_DATA_PART
+
+halium-boot does not use fixup-mountpoints, so disable it
+until hybris-boot will become relevant again.
+
+Change-Id: Ia3746395eb6784da3dacf187faf3a91d41425265
+---
+ Android.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Android.mk b/Android.mk
+index 5255572..5e8bf01 100644
+--- a/Android.mk
++++ b/Android.mk
+@@ -72,7 +72,7 @@ $(warning ********************* /boot appears to live on $(HYBRIS_BOOT_PART))
+ $(warning ********************* /data appears to live on $(HYBRIS_DATA_PART))
+ 
+ ifneq ($(words $(HYBRIS_DATA_PART)),1)
+-$(error There should be a one and only one device entry for HYBRIS_DATA_PART)
++#$(error There should be a one and only one device entry for HYBRIS_DATA_PART)
+ endif
+ 
+ # Command used to make the image
+-- 
+2.25.0
+

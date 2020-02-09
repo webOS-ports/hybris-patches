@@ -1,0 +1,25 @@
+From 582bc58f2c450ce97b6fbe651e253e0af91d2599 Mon Sep 17 00:00:00 2001
+From: NeKit <nekit1000@gmail.com>
+Date: Sun, 9 Feb 2020 19:36:22 +0100
+Subject: [PATCH] (halium) preload SELinux stubs
+
+Change-Id: I57ed8119ae3a73db292458d3fb23e63aeb2f0eeb
+---
+ vold.rc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/vold.rc b/vold.rc
+index 93d8786..aee62f7 100644
+--- a/vold.rc
++++ b/vold.rc
+@@ -1,6 +1,7 @@
+ service vold /system/bin/vold \
+         --blkid_context=u:r:blkid:s0 --blkid_untrusted_context=u:r:blkid_untrusted:s0 \
+         --fsck_context=u:r:fsck:s0 --fsck_untrusted_context=u:r:fsck_untrusted:s0
++    setenv LD_PRELOAD /system/lib64/libselinux_stubs.so
+     class core
+     ioprio be 2
+     writepid /dev/cpuset/foreground/tasks
+-- 
+2.25.0
+

@@ -1,0 +1,28 @@
+From a178e891f30fe37edb2ec9d9a775b0f984dc9387 Mon Sep 17 00:00:00 2001
+From: NeKit <nekit1000@gmail.com>
+Date: Sun, 9 Feb 2020 18:14:34 +0100
+Subject: [PATCH 39/40] (halium) Allow libselinux_stubs.so to be preloaded into
+ vendor binaries
+
+Change-Id: Ib80f858523c0a6493e22b53220f895fc200441af
+---
+ rootdir/etc/ld.config.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/rootdir/etc/ld.config.txt b/rootdir/etc/ld.config.txt
+index 42dc7ab..a99980d 100644
+--- a/rootdir/etc/ld.config.txt
++++ b/rootdir/etc/ld.config.txt
+@@ -277,7 +277,8 @@ namespace.default.asan.permitted.paths += /data/asan/vendor
+ namespace.default.asan.permitted.paths +=           /vendor
+ 
+ namespace.default.links = system,vndk
+-namespace.default.link.system.shared_libs = %LLNDK_LIBRARIES%
++namespace.default.link.system.shared_libs  = %LLNDK_LIBRARIES%
++namespace.default.link.system.shared_libs += libselinux_stubs.so
+ namespace.default.link.vndk.shared_libs  = %VNDK_SAMEPROCESS_LIBRARIES%
+ namespace.default.link.vndk.shared_libs += %VNDK_CORE_LIBRARIES%
+ 
+-- 
+2.25.0
+

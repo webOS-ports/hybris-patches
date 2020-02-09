@@ -1,0 +1,26 @@
+From 8c9aa4a6daa1bb2d05a1d40f52bcb0879e860be0 Mon Sep 17 00:00:00 2001
+From: NeKit <nekit1000@gmail.com>
+Date: Sun, 9 Feb 2020 19:28:44 +0100
+Subject: [PATCH] (halium) disable netd
+
+Change-Id: Id5d2a6e75d0e7bba5fd6046b46e38e53afee6606
+---
+ server/netd.rc | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/server/netd.rc b/server/netd.rc
+index 8100636..07b5ddb 100644
+--- a/server/netd.rc
++++ b/server/netd.rc
+@@ -1,4 +1,7 @@
+-service netd /system/bin/netd
++# disable netd by pointing it to a non-existing file. Further service
++# definitions will be ignored and this one has to be included first.
++
++service netd /system/bin/netd_HYBRIS_DISABLED
+     class main
+     socket netd stream 0660 root system
+     socket dnsproxyd stream 0660 root inet
+-- 
+2.25.0
+

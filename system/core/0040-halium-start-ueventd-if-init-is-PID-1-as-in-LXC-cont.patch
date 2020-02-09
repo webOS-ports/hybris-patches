@@ -1,0 +1,56 @@
+From e41f17b9973c5a1e81f8bc490f526837ba9f2c75 Mon Sep 17 00:00:00 2001
+From: NeKit <nekit1000@gmail.com>
+Date: Sun, 9 Feb 2020 18:15:59 +0100
+Subject: [PATCH 40/40] (halium) start ueventd if init is PID 1 (as in LXC
+ container)
+
+Change-Id: I1fa2127138ea2fc38382bf56e6967b853efb6b23
+---
+ init/ueventd.cpp | 5 +++++
+ rootdir/init.rc  | 6 +++---
+ 2 files changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/init/ueventd.cpp b/init/ueventd.cpp
+index 4709c4d..c61c6e9 100644
+--- a/init/ueventd.cpp
++++ b/init/ueventd.cpp
+@@ -258,6 +258,11 @@ int ueventd_main(int argc, char** argv) {
+      */
+     umask(000);
+ 
++    if (getppid() != 1) {
++        LOG(INFO) << "ueventd is not started by PID 1, exiting (droid-hal-init setup scheme relies on udev instead)";
++        exit(0);
++    }
++
+     InitKernelLogging(argv);
+ 
+     LOG(INFO) << "ueventd started!";
+diff --git a/rootdir/init.rc b/rootdir/init.rc
+index 66aaf86..812e498 100644
+--- a/rootdir/init.rc
++++ b/rootdir/init.rc
+@@ -33,7 +33,7 @@ on early-init
+     mount cgroup none /acct nodev noexec nosuid cpuacct
+     mkdir /acct/uid
+ 
+-    #start ueventd
++    start ueventd
+ 
+ on init
+     sysclktz 0
+@@ -753,9 +753,9 @@ on property:security.perf_harden=1
+ ##
+ service ueventd /sbin/ueventd
+     class core
+-    critical
++    # critical
+     seclabel u:r:ueventd:s0
+-    shutdown critical
++    # shutdown critical
+ #Not used by Mer
+     disabled
+ 
+-- 
+2.25.0
+

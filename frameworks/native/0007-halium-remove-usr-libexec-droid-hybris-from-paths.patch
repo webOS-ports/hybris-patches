@@ -1,0 +1,59 @@
+From ac1111ae6afe907a68c1f7be3e06efe1547793c3 Mon Sep 17 00:00:00 2001
+From: NeKit <nekit1000@gmail.com>
+Date: Sun, 9 Feb 2020 18:08:14 +0100
+Subject: [PATCH 7/7] (halium) remove /usr/libexec/droid-hybris from paths
+
+Halium builds minified systemimage, so no need for overlaying
+
+Change-Id: I1d4b4b328c15c733bb70f86faefb818d373a44cd
+---
+ cmds/servicemanager/servicemanager.rc     | 8 ++++----
+ services/surfaceflinger/surfaceflinger.rc | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/cmds/servicemanager/servicemanager.rc b/cmds/servicemanager/servicemanager.rc
+index bc2748b..17e0083 100644
+--- a/cmds/servicemanager/servicemanager.rc
++++ b/cmds/servicemanager/servicemanager.rc
+@@ -1,5 +1,5 @@
+ service servicemanager /system/bin/servicemanager
+-    setenv LD_PRELOAD /usr/libexec/droid-hybris/system/lib64/libselinux_stubs.so
++    setenv LD_PRELOAD /system/lib64/libselinux_stubs.so
+     class core animation
+     user system
+     group system readproc
+@@ -20,18 +20,18 @@ service servicemanager /system/bin/servicemanager
+     writepid /dev/cpuset/system-background/tasks
+     shutdown critical
+ 
+-service minimedia /usr/libexec/droid-hybris/system/bin/minimediaservice
++service minimedia /system/bin/minimediaservice
+     class main
+     user media
+     group audio camera
+     ioprio rt 4
+ 
+-service minisf /usr/libexec/droid-hybris/system/bin/minisfservice
++service minisf /system/bin/minisfservice
+     class main
+     user system
+     group graphics
+ 
+-service miniaf /usr/libexec/droid-hybris/system/bin/miniafservice
++service miniaf /system/bin/miniafservice
+     class main
+     user system
+     group audio
+diff --git a/services/surfaceflinger/surfaceflinger.rc b/services/surfaceflinger/surfaceflinger.rc
+index 12482c7..026454b 100644
+--- a/services/surfaceflinger/surfaceflinger.rc
++++ b/services/surfaceflinger/surfaceflinger.rc
+@@ -1,4 +1,4 @@
+-service surfaceflinger /system/bin/surfaceflinger
++service surfaceflinger /system/bin/surfaceflinger_HYBRIS_DISABLED
+     class core animation
+     user system
+     group graphics drmrpc readproc
+-- 
+2.25.0
+

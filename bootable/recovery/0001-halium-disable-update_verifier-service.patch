@@ -1,0 +1,30 @@
+From c4f5ffd3d72a8e4bd98e731ac72d964e7bbdfc62 Mon Sep 17 00:00:00 2001
+From: NeKit <nekit1000@gmail.com>
+Date: Sun, 9 Feb 2020 19:30:12 +0100
+Subject: [PATCH] (halium) disable update_verifier service
+
+Change-Id: Icc86316541d4e207272960ef2cddd0d24317c4af
+---
+ update_verifier/update_verifier.rc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/update_verifier/update_verifier.rc b/update_verifier/update_verifier.rc
+index 862b062..eeb98a2 100644
+--- a/update_verifier/update_verifier.rc
++++ b/update_verifier/update_verifier.rc
+@@ -1,10 +1,10 @@
+-service update_verifier_nonencrypted /system/bin/update_verifier nonencrypted
++service update_verifier_nonencrypted /system/bin/update_verifier_HYBRIS_DISABLED nonencrypted
+     user root
+     group cache system
+     priority -20
+     ioprio rt 0
+ 
+-service update_verifier /system/bin/update_verifier ${vold.decrypt}
++service update_verifier /system/bin/update_verifier_HYBRIS_DISABLED ${vold.decrypt}
+     user root
+     group cache system
+     priority -20
+-- 
+2.25.0
+

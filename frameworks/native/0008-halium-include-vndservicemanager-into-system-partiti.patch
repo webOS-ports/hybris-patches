@@ -1,0 +1,37 @@
+From 87adc861590c7546a176fe0f665c52f4bd82d8b3 Mon Sep 17 00:00:00 2001
+From: NeKit <nekit1000@gmail.com>
+Date: Sun, 9 Feb 2020 20:13:50 +0100
+Subject: [PATCH 8/8] (halium) include vndservicemanager into system partition
+ to override service
+
+Change-Id: Ia77e6be009a4410aa8a05351a192e9d4dfe22c87
+---
+ cmds/servicemanager/Android.bp           | 1 -
+ cmds/servicemanager/vndservicemanager.rc | 1 +
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmds/servicemanager/Android.bp b/cmds/servicemanager/Android.bp
+index 428561b..a552ba2 100644
+--- a/cmds/servicemanager/Android.bp
++++ b/cmds/servicemanager/Android.bp
+@@ -38,7 +38,6 @@ cc_binary {
+ cc_binary {
+     name: "vndservicemanager",
+     defaults: ["servicemanager_flags"],
+-    vendor: true,
+     srcs: [
+         "service_manager.c",
+         "binder.c",
+diff --git a/cmds/servicemanager/vndservicemanager.rc b/cmds/servicemanager/vndservicemanager.rc
+index 3fa4d7d..a754c47 100644
+--- a/cmds/servicemanager/vndservicemanager.rc
++++ b/cmds/servicemanager/vndservicemanager.rc
+@@ -1,4 +1,5 @@
+ service vndservicemanager /vendor/bin/vndservicemanager /dev/vndbinder
++    setenv LD_PRELOAD /system/lib64/libselinux_stubs.so
+     class core
+     user system
+     group system readproc
+-- 
+2.25.0
+
