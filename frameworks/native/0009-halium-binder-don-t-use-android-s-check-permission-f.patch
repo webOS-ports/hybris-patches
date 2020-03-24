@@ -1,0 +1,56 @@
+From cab1247927e2af0269ee3f3fd5523574822fbec5 Mon Sep 17 00:00:00 2001
+From: Ricardo Salveti de Araujo <ricardo.salveti@canonical.com>
+Date: Mon, 26 Nov 2012 15:02:39 -0200
+Subject: [PATCH] (halium) binder: don't use android's check permission feature
+
+Change-Id: I70946811c0af9899c46b4217f662bb41503b36e8
+Signed-off-by: Ricardo Salveti de Araujo <ricardo.salveti@canonical.com>
+Signed-off-by: Ondrej Kubik <ondrej.kubik@canonical.com>
+(cherry picked from commit 00a0316b7d4d82437d733479fe7a0890a8f28fe7)
+---
+ cmds/servicemanager/service_manager.c | 6 +++---
+ libs/binder/IServiceManager.cpp       | 4 ++++
+ 2 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/cmds/servicemanager/service_manager.c b/cmds/servicemanager/service_manager.c
+index 6b340a8..1052415 100644
+--- a/cmds/servicemanager/service_manager.c
++++ b/cmds/servicemanager/service_manager.c
+@@ -113,9 +113,9 @@ static int svc_can_register(const uint16_t *name, size_t name_len, pid_t spid, u
+ {
+     const char *perm = "add";
+ 
+-    if (multiuser_get_app_id(uid) >= AID_APP) {
+-        return 0; /* Don't allow apps to register services */
+-    }
++    /*if (multiuser_get_app_id(uid) >= AID_APP) {
++        return 0; // Don't allow apps to register services
++    }*/ // Halium: allow phablet
+ 
+     return check_mac_perms_from_lookup(spid, uid, perm, str8(name, name_len)) ? 1 : 0;
+ }
+diff --git a/libs/binder/IServiceManager.cpp b/libs/binder/IServiceManager.cpp
+index 6807ac4..ef9638a 100644
+--- a/libs/binder/IServiceManager.cpp
++++ b/libs/binder/IServiceManager.cpp
+@@ -64,6 +64,8 @@ static String16 _permission("permission");
+ 
+ bool checkCallingPermission(const String16& permission, int32_t* outPid, int32_t* outUid)
+ {
++    return true;
++
+     IPCThreadState* ipcState = IPCThreadState::self();
+     pid_t pid = ipcState->getCallingPid();
+     uid_t uid = ipcState->getCallingUid();
+@@ -74,6 +76,8 @@ bool checkCallingPermission(const String16& permission, int32_t* outPid, int32_t
+ 
+ bool checkPermission(const String16& permission, pid_t pid, uid_t uid)
+ {
++    return true;
++
+     sp<IPermissionController> pc;
+     gDefaultServiceManagerLock.lock();
+     pc = gPermissionController;
+-- 
+2.25.1
+
