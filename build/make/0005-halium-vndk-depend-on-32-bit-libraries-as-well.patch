@@ -1,0 +1,32 @@
+From de3fa3e5f446b52a4420235b0722257e297b62f5 Mon Sep 17 00:00:00 2001
+From: NeKit <nekit1000@gmail.com>
+Date: Tue, 24 Mar 2020 15:39:09 +0100
+Subject: [PATCH] (halium) vndk: depend on 32-bit libraries as well
+
+Change-Id: Ie84e4e8ff034468e28e0d77b478d39df8d3a8125
+---
+ target/product/vndk/Android.mk | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/target/product/vndk/Android.mk b/target/product/vndk/Android.mk
+index 768cb80..e9a6330 100644
+--- a/target/product/vndk/Android.mk
++++ b/target/product/vndk/Android.mk
+@@ -94,6 +94,14 @@ LOCAL_REQUIRED_MODULES := \
+     $(LLNDK_LIBRARIES) \
+     llndk.libraries.txt \
+     vndksp.libraries.txt
++
++# Halium hack to include 32-bit vndk libs on 64-bit targets
++ifeq (true,$(TARGET_SUPPORTS_64_BIT_APPS))
++LOCAL_REQUIRED_MODULES += \
++    $(addsuffix .vendor_32,$(VNDK_CORE_LIBRARIES)) \
++    $(addsuffix .vendor_32,$(VNDK_SAMEPROCESS_LIBRARIES))
++endif
++
+ include $(BUILD_PHONY_PACKAGE)
+ 
+ include $(CLEAR_VARS)
+-- 
+2.25.1
+
