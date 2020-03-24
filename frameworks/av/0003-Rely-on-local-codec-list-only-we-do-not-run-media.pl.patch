@@ -1,0 +1,36 @@
+From 4ea8a6e2297bb3dbe21bd2aad4def65ec609c84b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Thomas=20Vo=C3=9F?= <thomas.voss.bochum@gmail.com>
+Date: Wed, 3 Feb 2016 17:46:38 +0100
+Subject: [PATCH] Rely on local codec list only, we do not run
+ media.player/service.
+
+Signed-off-by: Ondrej Kubik <ondrej.kubik@canonical.com>
+---
+ media/libstagefright/MediaCodecList.cpp | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/media/libstagefright/MediaCodecList.cpp b/media/libstagefright/MediaCodecList.cpp
+index eaff283..77213f9 100644
+--- a/media/libstagefright/MediaCodecList.cpp
++++ b/media/libstagefright/MediaCodecList.cpp
+@@ -174,7 +174,7 @@ void MediaCodecList::BinderDeathObserver::binderDied(const wp<IBinder> &who __un
+ 
+ // static
+ sp<IMediaCodecList> MediaCodecList::getInstance() {
+-    Mutex::Autolock _l(sRemoteInitMutex);
++    /* Mutex::Autolock _l(sRemoteInitMutex);
+     if (sRemoteList == nullptr) {
+         sp<IBinder> binder =
+             defaultServiceManager()->getService(String16("media.player"));
+@@ -193,6 +193,8 @@ sp<IMediaCodecList> MediaCodecList::getInstance() {
+         }
+     }
+     return sRemoteList;
++    // Halium: rely on local codec list */
++    return getLocalInstance();
+ }
+ 
+ MediaCodecList::MediaCodecList(std::vector<MediaCodecListBuilderBase*> builders) {
+-- 
+2.25.1
+
