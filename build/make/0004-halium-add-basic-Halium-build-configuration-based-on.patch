@@ -1,32 +1,44 @@
-From 3e88438225ac9d06f77a06c6b051f755ee3ecb6a Mon Sep 17 00:00:00 2001
+From 7c265ed816d866a4b85c9e3455890214903e37b5 Mon Sep 17 00:00:00 2001
 From: NeKit <nekit1000@gmail.com>
 Date: Sun, 9 Feb 2020 18:35:53 +0100
-Subject: [PATCH 4/4] (halium) add basic Halium build configuration based on
+Subject: [PATCH 4/5] (halium) add basic Halium build configuration based on
  embedded.mk
 
 Change-Id: I7ce0e771a5bdd0a94bd43af35bbfff3edc75dfd1
 ---
- target/product/halium.mk | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ target/product/halium.mk | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
  create mode 100644 target/product/halium.mk
 
 diff --git a/target/product/halium.mk b/target/product/halium.mk
 new file mode 100644
-index 0000000..2ec3c6f
+index 0000000..6d492c9
 --- /dev/null
 +++ b/target/product/halium.mk
-@@ -0,0 +1,11 @@
+@@ -0,0 +1,23 @@
 +# Required Android parts not included by embedded.mk
 +PRODUCT_PACKAGES += \
 +    ld.config.txt \
-+    logd
++    libhidlmemory \
++    libion \
++    logd \
++    toybox
 +
 +# Halium-specific packages
 +PRODUCT_PACKAGES += \
++    libdroidmedia \
 +    libhwc2_compat_layer \
-+    libselinux_stubs
++    libmedia_compat_layer \
++    libminisf \
++    libselinux_stubs \
++    libubuntu_application_api \
++    minimediaservice \
++    sensorservice
++
++# UBPorts platform-api relies on normal sensorservice running
++MINIMEDIA_SENSORSERVER_DISABLE := 1
 +
 +$(call inherit-product, $(SRC_TARGET_DIR)/product/embedded.mk)
 -- 
-2.25.0
+2.26.0
 
