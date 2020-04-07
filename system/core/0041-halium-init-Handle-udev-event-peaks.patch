@@ -1,0 +1,33 @@
+From 90412233ac76d266b57e12c5b5a680c5683e166a Mon Sep 17 00:00:00 2001
+From: Alfonso Sanchez-Beato <alfonso.sanchez-beato@canonical.com>
+Date: Mon, 15 Feb 2016 19:36:32 +0100
+Subject: [PATCH 41/42] (halium) init: Handle udev event peaks
+
+There were peaks of udev events that made poll fail with POLLERR, being
+the socket error ENOBUFS. This made ueventd exit. We increase the
+buffer size to the maximum possible to avoid this. This is the same
+udev does (see https://bugzilla.redhat.com/show_bug.cgi?id=655857).
+Fixes LP #1543278.
+
+Change-Id: Iac67738fc5d19ddee559159428fa7033ba0a8fce
+Signed-off-by: Ondrej Kubik <ondrej.kubik@canonical.com>
+---
+ init/uevent_listener.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/init/uevent_listener.cpp b/init/uevent_listener.cpp
+index 24b14c4..1dc3097 100644
+--- a/init/uevent_listener.cpp
++++ b/init/uevent_listener.cpp
+@@ -84,7 +84,7 @@ static void ParseEvent(const char* msg, Uevent* uevent) {
+ 
+ UeventListener::UeventListener() {
+     // is 2MB enough? udev uses 128MB!
+-    device_fd_.reset(uevent_open_socket(2 * 1024 * 1024, true));
++    device_fd_.reset(uevent_open_socket(128 * 1024 * 1024, true));
+     if (device_fd_ == -1) {
+         LOG(FATAL) << "Could not open uevent socket";
+     }
+-- 
+2.26.0
+
