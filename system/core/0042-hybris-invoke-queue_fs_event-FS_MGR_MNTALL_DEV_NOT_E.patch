@@ -1,0 +1,58 @@
+From 0ed26c1815e5243b2408063e55234cc7f86fab3b Mon Sep 17 00:00:00 2001
+From: NeKit <nekit1000@gmail.com>
+Date: Tue, 10 Sep 2019 01:12:35 +0200
+Subject: [PATCH 42/42] (hybris) invoke
+ queue_fs_event(FS_MGR_MNTALL_DEV_NOT_ENCRYPTED)
+
+Needed to fix MediaTek nvram daemon startup issues, as Mer way of triggering late_start
+does not seem to work for it
+---
+ init/builtins.cpp | 5 +----
+ rootdir/init.rc   | 5 +++--
+ 2 files changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/init/builtins.cpp b/init/builtins.cpp
+index 4e2bce3..707ab22 100644
+--- a/init/builtins.cpp
++++ b/init/builtins.cpp
+@@ -589,7 +589,6 @@ static Result<Success> do_mount_all(const BuiltinArguments& args) {
+         return Error() << "mount_fstab() failed " << mount_fstab_return_code.error();
+     }
+ */
+-    Result<int> mount_fstab_return_code = WEXITSTATUS(0);
+     property_set(prop_name, std::to_string(t.duration().count()));
+ 
+     if (import_rc) {
+@@ -597,12 +596,10 @@ static Result<Success> do_mount_all(const BuiltinArguments& args) {
+         import_late(args.args, 2, path_arg_end);
+     }
+ 
+-    queue_event = false; // hybris does trigger_late_start.
+-
+     if (queue_event) {
+         /* queue_fs_event will queue event based on mount_fstab return code
+          * and return processed return code*/
+-        auto queue_fs_result = queue_fs_event(*mount_fstab_return_code);
++        auto queue_fs_result = queue_fs_event(FS_MGR_MNTALL_DEV_NOT_ENCRYPTED);
+         if (!queue_fs_result) {
+             return Error() << "queue_fs_event() failed: " << queue_fs_result.error();
+         }
+diff --git a/rootdir/init.rc b/rootdir/init.rc
+index 812e498..7ab1d4a 100644
+--- a/rootdir/init.rc
++++ b/rootdir/init.rc
+@@ -695,8 +695,9 @@ on property:sys.init_log_level=*
+     loglevel ${sys.init_log_level}
+ 
+ # Mer needs to set this property when fs units are mounted
+-on property:droid.late_start=trigger_late_start
+-    class_start late_start
++# Halium-specific: set nonencrypted on mount_all instead to fix nvram daemon
++# on property:droid.late_start=trigger_late_start
++#     class_start late_start
+ 
+ on charger
+     trigger late-init
+-- 
+2.26.0
+
