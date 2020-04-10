@@ -1,4 +1,4 @@
-From 7c265ed816d866a4b85c9e3455890214903e37b5 Mon Sep 17 00:00:00 2001
+From baf968095b378713fb183a807b3f6f9661a61e17 Mon Sep 17 00:00:00 2001
 From: NeKit <nekit1000@gmail.com>
 Date: Sun, 9 Feb 2020 18:35:53 +0100
 Subject: [PATCH 4/5] (halium) add basic Halium build configuration based on
@@ -6,16 +6,16 @@ Subject: [PATCH 4/5] (halium) add basic Halium build configuration based on
 
 Change-Id: I7ce0e771a5bdd0a94bd43af35bbfff3edc75dfd1
 ---
- target/product/halium.mk | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ target/product/halium.mk | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
  create mode 100644 target/product/halium.mk
 
 diff --git a/target/product/halium.mk b/target/product/halium.mk
 new file mode 100644
-index 0000000..6d492c9
+index 0000000..ac38e1c
 --- /dev/null
 +++ b/target/product/halium.mk
-@@ -0,0 +1,23 @@
+@@ -0,0 +1,19 @@
 +# Required Android parts not included by embedded.mk
 +PRODUCT_PACKAGES += \
 +    ld.config.txt \
@@ -32,11 +32,7 @@ index 0000000..6d492c9
 +    libminisf \
 +    libselinux_stubs \
 +    libubuntu_application_api \
-+    minimediaservice \
-+    sensorservice
-+
-+# UBPorts platform-api relies on normal sensorservice running
-+MINIMEDIA_SENSORSERVER_DISABLE := 1
++    minimediaservice
 +
 +$(call inherit-product, $(SRC_TARGET_DIR)/product/embedded.mk)
 -- 
