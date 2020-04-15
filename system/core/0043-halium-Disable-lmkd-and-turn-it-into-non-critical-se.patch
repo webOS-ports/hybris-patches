@@ -1,0 +1,25 @@
+From 31fe88b18efe0f4c7908b2e142c038ff0058baef Mon Sep 17 00:00:00 2001
+From: Alfred Neumayer <dev.beidl@gmail.com>
+Date: Wed, 15 Apr 2020 20:08:59 +0000
+Subject: [PATCH] (halium): Disable lmkd and turn it into non-critical service
+
+Change-Id: I5df9f45f4410d87d33f8ad47966b8ea6f743a6df
+---
+ lmkd/lmkd.rc | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/lmkd/lmkd.rc b/lmkd/lmkd.rc
+index 3bb84ab..c19d678 100644
+--- a/lmkd/lmkd.rc
++++ b/lmkd/lmkd.rc
+@@ -1,6 +1,5 @@
+-service lmkd /system/bin/lmkd
++service lmkd /system/bin/lmkd_HALIUM_DISABLED
+     class core
+     group root readproc
+-    critical
+     socket lmkd seqpacket 0660 system system
+     writepid /dev/cpuset/system-background/tasks
+-- 
+2.17.1
+
