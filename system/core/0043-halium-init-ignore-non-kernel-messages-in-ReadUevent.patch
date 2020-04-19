@@ -1,0 +1,35 @@
+From 9603a4cff66de1c5f6851ff5d72265255743a1b0 Mon Sep 17 00:00:00 2001
+From: NeKit <nekit1000@gmail.com>
+Date: Sun, 19 Apr 2020 23:47:38 +0200
+Subject: [PATCH] (halium) init: ignore non-kernel messages in ReadUevent
+
+Do not abort processing pending uevents in case uevent_kernel_multicast_recv
+returns EIO errno.
+
+This helps not to break ueventd coldboot mechanism when running in parallel
+with udev which will send its own events to netlink socket.
+
+Change-Id: Ib7e4521899035e2dc67efaf27fc1bea13659efb4
+---
+ init/uevent_listener.cpp | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/init/uevent_listener.cpp b/init/uevent_listener.cpp
+index 1dc3097..01289eb 100644
+--- a/init/uevent_listener.cpp
++++ b/init/uevent_listener.cpp
+@@ -96,7 +96,10 @@ bool UeventListener::ReadUevent(Uevent* uevent) const {
+     char msg[UEVENT_MSG_LEN + 2];
+     int n = uevent_kernel_multicast_recv(device_fd_, msg, UEVENT_MSG_LEN);
+     if (n <= 0) {
+-        if (errno != EAGAIN && errno != EWOULDBLOCK) {
++        if (errno == EIO) {
++            // ignore non-kernel message (probably from udev) but keep processing events
++            return true;
++        } else if (errno != EAGAIN && errno != EWOULDBLOCK) {
+             LOG(ERROR) << "Error reading from Uevent Fd";
+         }
+         return false;
+-- 
+2.26.0
+
