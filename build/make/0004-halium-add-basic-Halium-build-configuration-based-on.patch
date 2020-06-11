@@ -1,4 +1,4 @@
-From 2a29e7b186e3bba4072d14c22a531ff100d9c27f Mon Sep 17 00:00:00 2001
+From eac97d5bd6323f49408109d59f7aa7d2f7f40499 Mon Sep 17 00:00:00 2001
 From: NeKit <nekit1000@gmail.com>
 Date: Sun, 9 Feb 2020 18:35:53 +0100
 Subject: [PATCH 4/5] (halium) add basic Halium build configuration based on
@@ -6,30 +6,40 @@ Subject: [PATCH 4/5] (halium) add basic Halium build configuration based on
 
 Change-Id: I7ce0e771a5bdd0a94bd43af35bbfff3edc75dfd1
 ---
- target/product/halium.mk | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ target/product/halium.mk | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
  create mode 100644 target/product/halium.mk
 
 diff --git a/target/product/halium.mk b/target/product/halium.mk
 new file mode 100644
-index 0000000..798df4a
+index 0000000..166bf05
 --- /dev/null
 +++ b/target/product/halium.mk
-@@ -0,0 +1,23 @@
+@@ -0,0 +1,33 @@
 +# Required Android parts not included by embedded.mk
 +PRODUCT_PACKAGES += \
++    android.system.net.netd@1.1-service.stub \
 +    ip \
 +    ip6tables \
 +    iptables \
 +    ld.config.txt \
 +    libhidlmemory \
 +    libion \
++    libmedia_omx \
 +    logd \
 +    tc \
 +    toybox
 +
++# Produce binaries needed on host
++PRODUCT_PACKAGES += \
++    fec \
++    mke2fs \
++    mkuserimg_mke2fs.sh
++
 +# Halium-specific packages
 +PRODUCT_PACKAGES += \
++    fake_crypt \
++    libbiometry_fp_api \
 +    libdroidmedia \
 +    libhwc2_compat_layer \
 +    libmedia_compat_layer \
