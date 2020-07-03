@@ -1,0 +1,27 @@
+From 91daa52db818ead6c342a66a574ea52e1e902ccd Mon Sep 17 00:00:00 2001
+From: NeKit <nekit1000@gmail.com>
+Date: Fri, 3 Jul 2020 20:01:04 +0200
+Subject: [PATCH] (halium) disable CFI for arm64 as it seems to break libhybris
+
+Change-Id: Ifd62cb86cdaf13730e8ae0c42f0b1ce53de1190b
+---
+ cc/sanitize.go | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/cc/sanitize.go b/cc/sanitize.go
+index de97035..a13ff35 100644
+--- a/cc/sanitize.go
++++ b/cc/sanitize.go
+@@ -239,7 +239,8 @@ func (sanitize *sanitize) begin(ctx BaseModuleContext) {
+ 	}
+ 
+ 	// Also disable CFI for arm32 until b/35157333 is fixed.
+-	if ctx.Arch().ArchType == android.Arm {
++	// Halium: disable for arm64 as well as it breaks libhybris
++	if (ctx.Arch().ArchType == android.Arm || ctx.Arch().ArchType == android.Arm64){
+ 		s.Cfi = nil
+ 		s.Diag.Cfi = nil
+ 	}
+-- 
+2.27.0
+
