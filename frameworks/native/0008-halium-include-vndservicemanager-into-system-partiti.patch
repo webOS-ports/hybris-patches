@@ -1,7 +1,7 @@
 From 87adc861590c7546a176fe0f665c52f4bd82d8b3 Mon Sep 17 00:00:00 2001
 From: NeKit <nekit1000@gmail.com>
 Date: Sun, 9 Feb 2020 20:13:50 +0100
-Subject: [PATCH 8/8] (halium) include vndservicemanager into system partition
+Subject: [PATCH 8/9] (halium) include vndservicemanager into system partition
  to override service
 
 Change-Id: Ia77e6be009a4410aa8a05351a192e9d4dfe22c87

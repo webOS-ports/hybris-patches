@@ -1,7 +1,7 @@
 From 90412233ac76d266b57e12c5b5a680c5683e166a Mon Sep 17 00:00:00 2001
 From: Alfonso Sanchez-Beato <alfonso.sanchez-beato@canonical.com>
 Date: Mon, 15 Feb 2016 19:36:32 +0100
-Subject: [PATCH 41/42] (halium) init: Handle udev event peaks
+Subject: [PATCH 41/44] (halium) init: Handle udev event peaks
 
 There were peaks of udev events that made poll fail with POLLERR, being
 the socket error ENOBUFS. This made ueventd exit. We increase the

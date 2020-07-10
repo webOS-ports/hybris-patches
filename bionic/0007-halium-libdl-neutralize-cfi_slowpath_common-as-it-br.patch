@@ -1,7 +1,7 @@
 From b523d4c4be73ed7f3846b28b98ced6d1ae325d13 Mon Sep 17 00:00:00 2001
 From: NeKit <nekit1000@gmail.com>
 Date: Fri, 3 Jul 2020 20:10:20 +0200
-Subject: [PATCH 7/7] (halium) libdl: neutralize cfi_slowpath_common as it
+Subject: [PATCH 7/8] (halium) libdl: neutralize cfi_slowpath_common as it
  breaks libhybris
 
 Change-Id: I90b4af9d9e6b23cccafb659931a8e85b8bae091a

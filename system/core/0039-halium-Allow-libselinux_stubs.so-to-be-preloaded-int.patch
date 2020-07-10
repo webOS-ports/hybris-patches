@@ -1,7 +1,7 @@
 From a178e891f30fe37edb2ec9d9a775b0f984dc9387 Mon Sep 17 00:00:00 2001
 From: NeKit <nekit1000@gmail.com>
 Date: Sun, 9 Feb 2020 18:14:34 +0100
-Subject: [PATCH 39/40] (halium) Allow libselinux_stubs.so to be preloaded into
+Subject: [PATCH 39/44] (halium) Allow libselinux_stubs.so to be preloaded into
  vendor binaries
 
 Change-Id: Ib80f858523c0a6493e22b53220f895fc200441af

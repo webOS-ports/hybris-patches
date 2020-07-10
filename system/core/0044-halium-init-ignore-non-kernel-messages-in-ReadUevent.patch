@@ -1,7 +1,7 @@
 From 9603a4cff66de1c5f6851ff5d72265255743a1b0 Mon Sep 17 00:00:00 2001
 From: NeKit <nekit1000@gmail.com>
 Date: Sun, 19 Apr 2020 23:47:38 +0200
-Subject: [PATCH] (halium) init: ignore non-kernel messages in ReadUevent
+Subject: [PATCH 44/44] (halium) init: ignore non-kernel messages in ReadUevent
 
 Do not abort processing pending uevents in case uevent_kernel_multicast_recv
 returns EIO errno.

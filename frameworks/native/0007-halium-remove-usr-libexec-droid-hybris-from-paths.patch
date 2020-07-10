@@ -1,7 +1,7 @@
 From ac1111ae6afe907a68c1f7be3e06efe1547793c3 Mon Sep 17 00:00:00 2001
 From: NeKit <nekit1000@gmail.com>
 Date: Sun, 9 Feb 2020 18:08:14 +0100
-Subject: [PATCH 7/7] (halium) remove /usr/libexec/droid-hybris from paths
+Subject: [PATCH 7/9] (halium) remove /usr/libexec/droid-hybris from paths
 
 Halium builds minified systemimage, so no need for overlaying
 

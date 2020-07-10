@@ -1,7 +1,7 @@
 From c353bc17e0f90b3171cafafd153d016b22f3f067 Mon Sep 17 00:00:00 2001
 From: Franz-Josef Haider <franz.haider@jolla.com>
 Date: Thu, 30 Aug 2018 14:42:07 +0200
-Subject: [PATCH 1/3] (hybris) rename dbus group to adbus to avoid conflicts
+Subject: [PATCH 1/5] (hybris) rename dbus group to adbus to avoid conflicts
  with mer.
 
 ---

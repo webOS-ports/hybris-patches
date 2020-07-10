@@ -1,7 +1,8 @@
 From cab1247927e2af0269ee3f3fd5523574822fbec5 Mon Sep 17 00:00:00 2001
 From: Ricardo Salveti de Araujo <ricardo.salveti@canonical.com>
 Date: Mon, 26 Nov 2012 15:02:39 -0200
-Subject: [PATCH] (halium) binder: don't use android's check permission feature
+Subject: [PATCH 9/9] (halium) binder: don't use android's check permission
+ feature
 
 Change-Id: I70946811c0af9899c46b4217f662bb41503b36e8
 Signed-off-by: Ricardo Salveti de Araujo <ricardo.salveti@canonical.com>
