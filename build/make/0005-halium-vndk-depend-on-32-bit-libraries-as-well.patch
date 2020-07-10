@@ -1,7 +1,7 @@
 From de3fa3e5f446b52a4420235b0722257e297b62f5 Mon Sep 17 00:00:00 2001
 From: NeKit <nekit1000@gmail.com>
 Date: Tue, 24 Mar 2020 15:39:09 +0100
-Subject: [PATCH] (halium) vndk: depend on 32-bit libraries as well
+Subject: [PATCH 5/5] (halium) vndk: depend on 32-bit libraries as well
 
 Change-Id: Ie84e4e8ff034468e28e0d77b478d39df8d3a8125
 ---

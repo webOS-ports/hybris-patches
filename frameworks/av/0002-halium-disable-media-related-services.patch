@@ -1,7 +1,7 @@
 From 322b203ffc1fb8d7f15f56111debce0dd57c752c Mon Sep 17 00:00:00 2001
 From: NeKit <nekit1000@gmail.com>
 Date: Sun, 9 Feb 2020 18:39:54 +0100
-Subject: [PATCH 2/2] (halium) disable media-related services
+Subject: [PATCH 2/4] (halium) disable media-related services
 
 Their functionality is provided by minimedia in droidmedia repo instead
 

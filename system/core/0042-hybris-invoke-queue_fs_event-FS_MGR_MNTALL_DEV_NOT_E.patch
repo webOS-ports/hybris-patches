@@ -1,7 +1,7 @@
 From 0ed26c1815e5243b2408063e55234cc7f86fab3b Mon Sep 17 00:00:00 2001
 From: NeKit <nekit1000@gmail.com>
 Date: Tue, 10 Sep 2019 01:12:35 +0200
-Subject: [PATCH 42/42] (hybris) invoke
+Subject: [PATCH 42/44] (hybris) invoke
  queue_fs_event(FS_MGR_MNTALL_DEV_NOT_ENCRYPTED)
 
 Needed to fix MediaTek nvram daemon startup issues, as Mer way of triggering late_start

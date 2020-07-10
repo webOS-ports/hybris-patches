@@ -1,7 +1,7 @@
 From 28f6a85f72a532946b3ad64c5f316f23c770706c Mon Sep 17 00:00:00 2001
 From: Franz-Josef Haider <franz.haider@jolla.com>
 Date: Fri, 8 Jun 2018 14:44:30 +0200
-Subject: [PATCH 6/6] (hybris) use libselinux_stubs in servicemanager
+Subject: [PATCH 6/9] (hybris) use libselinux_stubs in servicemanager
 
 Change-Id: Iad17a5ff109e231237d7c0ed692a2dc178c99a5e
 ---

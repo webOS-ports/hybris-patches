@@ -1,7 +1,7 @@
 From e41f17b9973c5a1e81f8bc490f526837ba9f2c75 Mon Sep 17 00:00:00 2001
 From: NeKit <nekit1000@gmail.com>
 Date: Sun, 9 Feb 2020 18:15:59 +0100
-Subject: [PATCH 40/40] (halium) start ueventd if init is PID 1 (as in LXC
+Subject: [PATCH 40/44] (halium) start ueventd if init is PID 1 (as in LXC
  container)
 
 Change-Id: I1fa2127138ea2fc38382bf56e6967b853efb6b23

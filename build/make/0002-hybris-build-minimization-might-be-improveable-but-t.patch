@@ -1,7 +1,7 @@
 From 7f4bafbef13272a5c691c6e2ea0855e4790f5464 Mon Sep 17 00:00:00 2001
 From: Franz-Josef Haider <franz.haider@jolla.com>
 Date: Thu, 7 Jun 2018 15:32:40 +0000
-Subject: [PATCH 2/3] (hybris) build minimization (might be improveable, but
+Subject: [PATCH 2/5] (hybris) build minimization (might be improveable, but
  this version doesn't break dependancies)
 
 Change-Id: Ic862dc084f5f4e3fa7ccd90b0757deff0f17b802

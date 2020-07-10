@@ -1,7 +1,8 @@
 From 31fe88b18efe0f4c7908b2e142c038ff0058baef Mon Sep 17 00:00:00 2001
 From: Alfred Neumayer <dev.beidl@gmail.com>
 Date: Wed, 15 Apr 2020 20:08:59 +0000
-Subject: [PATCH] (halium): Disable lmkd and turn it into non-critical service
+Subject: [PATCH 43/44] (halium) Disable lmkd and turn it into non-critical
+ service
 
 Change-Id: I5df9f45f4410d87d33f8ad47966b8ea6f743a6df
 ---
