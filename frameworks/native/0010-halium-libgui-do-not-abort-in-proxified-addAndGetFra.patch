@@ -1,0 +1,30 @@
+From 61d79c27b37bc62df2c101caa2b7e65b87315d55 Mon Sep 17 00:00:00 2001
+From: NeKit <nekit1000@gmail.com>
+Date: Tue, 28 Jul 2020 17:59:04 +0200
+Subject: [PATCH 10/10] (halium) libgui: do not abort in proxified
+ addAndGetFrameTimestamps
+
+Avoids crash when playing media with arm64 rootfs on MediaTek device,
+though method itself is still not implemented.
+
+Change-Id: I37f1154df7c162f9907a71901b7e70c949cc78c5
+---
+ libs/gui/IConsumerListener.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libs/gui/IConsumerListener.cpp b/libs/gui/IConsumerListener.cpp
+index 85ac304..0132320 100644
+--- a/libs/gui/IConsumerListener.cpp
++++ b/libs/gui/IConsumerListener.cpp
+@@ -65,7 +65,7 @@ public:
+ 
+     void addAndGetFrameTimestamps(const NewFrameEventsEntry* /*newTimestamps*/,
+                                   FrameEventHistoryDelta* /*outDelta*/) override {
+-        LOG_ALWAYS_FATAL("IConsumerListener::addAndGetFrameTimestamps cannot be proxied");
++        ALOGE("IConsumerListener::addAndGetFrameTimestamps cannot be proxied");
+     }
+ };
+ 
+-- 
+2.27.0
+
