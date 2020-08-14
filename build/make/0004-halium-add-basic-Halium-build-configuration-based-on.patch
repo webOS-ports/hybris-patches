@@ -6,8 +6,8 @@ Subject: [PATCH 4/5] (halium) add basic Halium build configuration based on
 
 Change-Id: I7ce0e771a5bdd0a94bd43af35bbfff3edc75dfd1
 ---
- target/product/halium.mk | 34 +++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+ target/product/halium.mk | 37 +++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
  create mode 100644 target/product/halium.mk
 
 diff --git a/target/product/halium.mk b/target/product/halium.mk
@@ -15,7 +15,7 @@ new file mode 100644
 index 0000000..166bf05
 --- /dev/null
 +++ b/target/product/halium.mk
-@@ -0,0 +1,35 @@
+@@ -0,0 +1,37 @@
 +# Required Android parts not included by embedded.mk
 +PRODUCT_PACKAGES += \
 +    android.system.net.netd@1.1-service.stub \
@@ -39,6 +39,7 @@ index 0000000..166bf05
 +
 +# Halium-specific packages
 +PRODUCT_PACKAGES += \
++    camera_service \
 +    fake_crypt \
 +    libbiometry_fp_api \
 +    libcamera_compat_layer \
@@ -48,6 +49,7 @@ index 0000000..166bf05
 +    libminisf \
 +    libselinux_stubs \
 +    libubuntu_application_api \
++    micshm.sh \
 +    minimediaservice
 +
 +$(call inherit-product, $(SRC_TARGET_DIR)/product/embedded.mk)
