@@ -6,8 +6,8 @@ Subject: [PATCH 4/5] (halium) add basic Halium build configuration based on
 
 Change-Id: I7ce0e771a5bdd0a94bd43af35bbfff3edc75dfd1
 ---
- target/product/halium.mk | 37 +++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ target/product/halium.mk | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
  create mode 100644 target/product/halium.mk
 
 diff --git a/target/product/halium.mk b/target/product/halium.mk
@@ -15,13 +15,15 @@ new file mode 100644
 index 0000000..166bf05
 --- /dev/null
 +++ b/target/product/halium.mk
-@@ -0,0 +1,37 @@
+@@ -0,0 +1,39 @@
 +# Required Android parts not included by embedded.mk
 +PRODUCT_PACKAGES += \
 +    android.system.net.netd@1.1-service.stub \
 +    ip \
 +    ip6tables \
 +    iptables \
++    netutils-wrapper-1.0 \
++    ndc \
 +    ld.config.txt \
 +    libandroid_net \
 +    libhidlmemory \
@@ -54,5 +56,5 @@ index 0000000..166bf05
 +
 +$(call inherit-product, $(SRC_TARGET_DIR)/product/embedded.mk)
 -- 
-2.26.2
+2.17.1
 
