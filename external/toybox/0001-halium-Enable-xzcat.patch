@@ -1,0 +1,64 @@
+From 0ddff240a83d0c3cf9942ee13b03cc1d16bd8bc7 Mon Sep 17 00:00:00 2001
+From: Alfred Neumayer <dev.beidl@gmail.com>
+Date: Fri, 9 Oct 2020 17:07:57 +0200
+Subject: [PATCH] (halium): Enable xzcat
+
+Required by Ubuntu Touch for the system-image-upgrader in the recovery.
+
+Change-Id: I6a02ac32d69e649e639564f7f3337d18dc9ab379
+---
+ .config            | 2 +-
+ Android.mk         | 2 ++
+ generated/config.h | 4 ++--
+ 3 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/.config b/.config
+index 9cbdb07..105c257 100644
+--- a/.config
++++ b/.config
+@@ -330,6 +330,6 @@ CONFIG_WHOAMI=y
+ # CONFIG_XARGS_PEDANTIC is not set
+ CONFIG_XARGS=y
+ CONFIG_XXD=y
+-# CONFIG_XZCAT is not set
++CONFIG_XZCAT=y
+ CONFIG_YES=y
+ CONFIG_ZCAT=y
+diff --git a/Android.mk b/Android.mk
+index db73370..c85f98b 100644
+--- a/Android.mk
++++ b/Android.mk
+@@ -219,6 +219,7 @@ common_SRC_FILES := \
+     toys/posix/uuencode.c \
+     toys/posix/wc.c \
+     toys/posix/xargs.c \
++    toys/pending/xzcat.c \
+ 
+ common_CFLAGS := \
+     -std=gnu11 \
+@@ -398,6 +399,7 @@ ALL_TOOLS := \
+     xxd \
+     yes \
+     zcat \
++    xzcat
+ 
+ ALL_RECOVERY_TOOLS := \
+     $(ALL_TOOLS) \
+diff --git a/generated/config.h b/generated/config.h
+index 936ec83..9997797 100644
+--- a/generated/config.h
++++ b/generated/config.h
+@@ -634,8 +634,8 @@
+ #define USE_XARGS(...) __VA_ARGS__
+ #define CFG_XXD 1
+ #define USE_XXD(...) __VA_ARGS__
+-#define CFG_XZCAT 0
+-#define USE_XZCAT(...)
++#define CFG_XZCAT 1
++#define USE_XZCAT(...) __VA_ARGS__
+ #define CFG_YES 1
+ #define USE_YES(...) __VA_ARGS__
+ #define CFG_ZCAT 1
+-- 
+2.25.1
+
