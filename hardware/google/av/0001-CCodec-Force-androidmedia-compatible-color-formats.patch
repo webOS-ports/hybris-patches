@@ -1,0 +1,53 @@
+From 59881cfd80b94f321909670927ba0bfd799b7b70 Mon Sep 17 00:00:00 2001
+From: Alfred Neumayer <dev.beidl@gmail.com>
+Date: Wed, 14 Oct 2020 00:55:42 +0200
+Subject: [PATCH] CCodec: Force androidmedia-compatible color formats
+
+Only advertise color formats that are compatible as well as forcing
+COLOR_FormatYUV420Planar for decoder surfaces.
+
+Change-Id: Idd2ba758540779e626c610da2c76d890170d6a76
+---
+ media/sfplugin/CCodec.cpp            | 2 +-
+ media/sfplugin/Codec2InfoBuilder.cpp | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/media/sfplugin/CCodec.cpp b/media/sfplugin/CCodec.cpp
+index 1e74658..d9a38b6 100644
+--- a/media/sfplugin/CCodec.cpp
++++ b/media/sfplugin/CCodec.cpp
+@@ -766,7 +766,7 @@ void CCodec::configure(const sp<AMessage> &msg) {
+                  * needed for decoders.
+                  */
+                 if (!(config->mDomain & Config::IS_ENCODER)) {
+-                    format = (surface == nullptr) ? COLOR_FormatYUV420Planar : COLOR_FormatSurface;
++                    format = COLOR_FormatYUV420Planar;
+                 }
+             }
+ 
+diff --git a/media/sfplugin/Codec2InfoBuilder.cpp b/media/sfplugin/Codec2InfoBuilder.cpp
+index d883d46..742c3fb 100644
+--- a/media/sfplugin/Codec2InfoBuilder.cpp
++++ b/media/sfplugin/Codec2InfoBuilder.cpp
+@@ -593,14 +593,14 @@ status_t Codec2InfoBuilder::buildMediaCodecList(MediaCodecListWriter* writer) {
+             // MediaCodec color formats?
+             if (mediaType.find("video") != std::string::npos) {
+                 // vendor video codecs prefer opaque format
+-                if (trait.name.find("android") == std::string::npos) {
++                /*if (trait.name.find("android") == std::string::npos) {
+                     caps->addColorFormat(COLOR_FormatSurface);
+-                }
++                }*/
+                 caps->addColorFormat(COLOR_FormatYUV420Flexible);
+                 caps->addColorFormat(COLOR_FormatYUV420Planar);
+                 caps->addColorFormat(COLOR_FormatYUV420SemiPlanar);
+-                caps->addColorFormat(COLOR_FormatYUV420PackedPlanar);
+-                caps->addColorFormat(COLOR_FormatYUV420PackedSemiPlanar);
++                //caps->addColorFormat(COLOR_FormatYUV420PackedPlanar);
++                //caps->addColorFormat(COLOR_FormatYUV420PackedSemiPlanar);
+                 // framework video encoders must support surface format, though it is unclear
+                 // that they will be able to map it if it is opaque
+                 if (encoder && trait.name.find("android") != std::string::npos) {
+-- 
+2.25.1
+
