@@ -1,0 +1,75 @@
+From 86325527d409779b1c5392f4dcc2adeb7c906adc Mon Sep 17 00:00:00 2001
+From: Yin-Chia Yeh <yinchiayeh@google.com>
+Date: Thu, 26 Jul 2018 10:01:19 -0700
+Subject: [PATCH] Camera: skip unnecessary reconfig
+
+Test: manual testing 3rd party camera app + hacked walleye
+Bug: 111850901
+Change-Id: Ia2977a290bb0bd706f500a3d39e0d996d50cbe1e
+---
+ .../libcameraservice/api1/Camera2Client.cpp   | 48 ++++++++++---------
+ 1 file changed, 25 insertions(+), 23 deletions(-)
+
+diff --git a/services/camera/libcameraservice/api1/Camera2Client.cpp b/services/camera/libcameraservice/api1/Camera2Client.cpp
+index d59b313289..c8b3c2ff29 100644
+--- a/services/camera/libcameraservice/api1/Camera2Client.cpp
++++ b/services/camera/libcameraservice/api1/Camera2Client.cpp
+@@ -780,33 +780,35 @@ status_t Camera2Client::startPreviewL(Parameters &params, bool restart) {
+     int lastJpegStreamId = mJpegProcessor->getStreamId();
+     // If jpeg stream will slow down preview, make sure we remove it before starting preview
+     if (params.slowJpegMode) {
+-        // Pause preview if we are streaming
+-        int32_t activeRequestId = mStreamingProcessor->getActiveRequestId();
+-        if (activeRequestId != 0) {
+-            res = mStreamingProcessor->togglePauseStream(/*pause*/true);
+-            if (res != OK) {
+-                ALOGE("%s: Camera %d: Can't pause streaming: %s (%d)",
+-                        __FUNCTION__, mCameraId, strerror(-res), res);
+-            }
+-            res = mDevice->waitUntilDrained();
+-            if (res != OK) {
+-                ALOGE("%s: Camera %d: Waiting to stop streaming failed: %s (%d)",
+-                        __FUNCTION__, mCameraId, strerror(-res), res);
++        if (lastJpegStreamId != NO_STREAM) {
++            // Pause preview if we are streaming
++            int32_t activeRequestId = mStreamingProcessor->getActiveRequestId();
++            if (activeRequestId != 0) {
++                res = mStreamingProcessor->togglePauseStream(/*pause*/true);
++                if (res != OK) {
++                    ALOGE("%s: Camera %d: Can't pause streaming: %s (%d)",
++                            __FUNCTION__, mCameraId, strerror(-res), res);
++                }
++                res = mDevice->waitUntilDrained();
++                if (res != OK) {
++                    ALOGE("%s: Camera %d: Waiting to stop streaming failed: %s (%d)",
++                            __FUNCTION__, mCameraId, strerror(-res), res);
++                }
+             }
+-        }
+-
+-        res = mJpegProcessor->deleteStream();
+ 
+-        if (res != OK) {
+-            ALOGE("%s: Camera %d: delete Jpeg stream failed: %s (%d)",
+-                    __FUNCTION__, mCameraId,  strerror(-res), res);
+-        }
++            res = mJpegProcessor->deleteStream();
+ 
+-        if (activeRequestId != 0) {
+-            res = mStreamingProcessor->togglePauseStream(/*pause*/false);
+             if (res != OK) {
+-                ALOGE("%s: Camera %d: Can't unpause streaming: %s (%d)",
+-                        __FUNCTION__, mCameraId, strerror(-res), res);
++                ALOGE("%s: Camera %d: delete Jpeg stream failed: %s (%d)",
++                        __FUNCTION__, mCameraId,  strerror(-res), res);
++            }
++
++            if (activeRequestId != 0) {
++                res = mStreamingProcessor->togglePauseStream(/*pause*/false);
++                if (res != OK) {
++                    ALOGE("%s: Camera %d: Can't unpause streaming: %s (%d)",
++                            __FUNCTION__, mCameraId, strerror(-res), res);
++                }
+             }
+         }
+     } else {
