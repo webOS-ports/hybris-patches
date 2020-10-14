@@ -1,4 +1,4 @@
-From 40f1680694124e807f43c375d0849c9d4a82671b Mon Sep 17 00:00:00 2001
+From 10e0f9321bde831b5f8854edb457f3df5037c303 Mon Sep 17 00:00:00 2001
 From: Alfred Neumayer <dev.beidl@gmail.com>
 Date: Wed, 14 Oct 2020 00:57:01 +0200
 Subject: [PATCH] Client: Filter out non-qti codecs
@@ -10,14 +10,14 @@ Filter out any codecs that would be considered software decoders
 
 Change-Id: I5f401bb50eef7f96a836de6390f84d9307de501f
 ---
- codec2/hidl/client/client.cpp | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ codec2/hidl/client/client.cpp | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
 diff --git a/codec2/hidl/client/client.cpp b/codec2/hidl/client/client.cpp
-index ff67681..5e5ce88 100644
+index ff67681..2509ac6 100644
 --- a/codec2/hidl/client/client.cpp
 +++ b/codec2/hidl/client/client.cpp
-@@ -548,16 +548,26 @@ const std::vector<C2Component::Traits>& Codec2Client::listComponents() const {
+@@ -548,16 +548,33 @@ const std::vector<C2Component::Traits>& Codec2Client::listComponents() const {
      }
      Return<void> transStatus = base()->listComponents(
              [this](const hidl_vec<IComponentStore::ComponentTraits>& t) {
@@ -25,10 +25,17 @@ index ff67681..5e5ce88 100644
                  mTraitsList.resize(t.size());
                  mAliasesBuffer.resize(t.size());
                  for (size_t i = 0; i < t.size(); ++i) {
-+                    if (((std::string)t[i].name).find("c2.qti.") != 0) {
++                    std::string componentName = (std::string)(t[i].name);
++                    ALOGI("listComponents: %s", componentName.c_str());
++                    if ((componentName.find(".encoder") == std::string::npos) &&
++                          ((componentName.find("c2.android.") == 0) ||
++                          (componentName.find("OMX.google.") == 0) ||
++                          (componentName.find("OMX.qcom.") == 0))) {
 +                        ++removeCounter;
 +                        continue;
 +                    }
++
++                    ALOGI("Accepting component '%s'", componentName.c_str());
 +
                      c2_status_t status = objcpy(
 -                            &mTraitsList[i], &mAliasesBuffer[i], t[i]);
