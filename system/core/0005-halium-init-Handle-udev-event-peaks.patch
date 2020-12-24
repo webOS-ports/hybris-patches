@@ -1,0 +1,31 @@
+From 13f6fce463e161845446503f96d0a735c03dfcd5 Mon Sep 17 00:00:00 2001
+From: Alfonso Sanchez-Beato <alfonso.sanchez-beato@canonical.com>
+Date: Mon, 15 Feb 2016 19:36:32 +0100
+Subject: [PATCH] (halium) init: Handle udev event peaks
+
+There were peaks of udev events that made poll fail with POLLERR, being
+the socket error ENOBUFS. This made ueventd exit. We increase the
+buffer size to the maximum possible to avoid this. This is the same
+udev does (see https://bugzilla.redhat.com/show_bug.cgi?id=655857).
+Fixes LP #1543278.
+
+Change-Id: Iac67738fc5d19ddee559159428fa7033ba0a8fce
+Signed-off-by: Ondrej Kubik <ondrej.kubik@canonical.com>
+---
+ rootdir/ueventd.rc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rootdir/ueventd.rc b/rootdir/ueventd.rc
+index 41ad5bd09..25e054174 100644
+--- a/rootdir/ueventd.rc
++++ b/rootdir/ueventd.rc
+@@ -1,5 +1,5 @@
+ firmware_directories /etc/firmware/ /odm/firmware/ /vendor/firmware/ /firmware/image/
+-uevent_socket_rcvbuf_size 16M
++uevent_socket_rcvbuf_size 128M
+ 
+ subsystem graphics
+     devname uevent_devpath
+-- 
+2.28.0
+
