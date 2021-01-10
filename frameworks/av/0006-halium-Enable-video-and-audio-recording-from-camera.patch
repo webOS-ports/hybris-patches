@@ -117,7 +117,7 @@ index 00788a5..8303cfb 100644
          goto exit;
      }
 -    ALOG_ASSERT(record != 0);
-+    
++
 +    record = recording.ar;
 +    iMem = recording.cblk;
 +    bufferMem = recording.buffers;
