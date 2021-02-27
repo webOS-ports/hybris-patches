@@ -1,4 +1,4 @@
-From 10e0f9321bde831b5f8854edb457f3df5037c303 Mon Sep 17 00:00:00 2001
+From 6409371bb1535c96e14530be35eae89ac1c62f6b Mon Sep 17 00:00:00 2001
 From: Alfred Neumayer <dev.beidl@gmail.com>
 Date: Wed, 14 Oct 2020 00:57:01 +0200
 Subject: [PATCH] Client: Filter out non-qti codecs
@@ -10,14 +10,39 @@ Filter out any codecs that would be considered software decoders
 
 Change-Id: I5f401bb50eef7f96a836de6390f84d9307de501f
 ---
- codec2/hidl/client/client.cpp | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+ codec2/hidl/client/client.cpp | 36 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 35 insertions(+), 1 deletion(-)
 
 diff --git a/codec2/hidl/client/client.cpp b/codec2/hidl/client/client.cpp
-index ff67681..2509ac6 100644
+index ff67681..1ef1c42 100644
 --- a/codec2/hidl/client/client.cpp
 +++ b/codec2/hidl/client/client.cpp
-@@ -548,16 +548,33 @@ const std::vector<C2Component::Traits>& Codec2Client::listComponents() const {
+@@ -541,6 +541,24 @@ c2_status_t Codec2Client::createInputSurface(
+     return C2_OK;
+ }
+ 
++static bool isSoftwareVideoDecoder(std::string& componentName) {
++    return ((componentName.find("c2.android.") == 0) ||
++            (componentName.find("OMX.google.") == 0) ||
++            (componentName.find("OMX.qcom.") == 0));
++}
++
++static bool isAudioDecoder(std::string& componentName) {
++    return ((componentName.find("c2.android.aac.decoder") == 0) ||
++            (componentName.find("c2.android.amrnb.decoder") == 0) ||
++            (componentName.find("c2.android.amrwb.decoder") == 0) ||
++            (componentName.find("c2.android.g711.alaw.decoder") == 0) ||
++            (componentName.find("c2.android.g711.mlaw.decoder") == 0) ||
++            (componentName.find("c2.android.mp3.decoder") == 0) ||
++            (componentName.find("c2.android.opus.decoder") == 0) ||
++            (componentName.find("c2.android.flac.decoder") == 0) ||
++            (componentName.find("c2.android.gsm.decoder") == 0));
++}
++
+ const std::vector<C2Component::Traits>& Codec2Client::listComponents() const {
+     std::lock_guard<std::mutex> lock(mMutex);
+     if (mListed) {
+@@ -548,16 +566,32 @@ const std::vector<C2Component::Traits>& Codec2Client::listComponents() const {
      }
      Return<void> transStatus = base()->listComponents(
              [this](const hidl_vec<IComponentStore::ComponentTraits>& t) {
@@ -27,10 +52,9 @@ index ff67681..2509ac6 100644
                  for (size_t i = 0; i < t.size(); ++i) {
 +                    std::string componentName = (std::string)(t[i].name);
 +                    ALOGI("listComponents: %s", componentName.c_str());
-+                    if ((componentName.find(".encoder") == std::string::npos) &&
-+                          ((componentName.find("c2.android.") == 0) ||
-+                          (componentName.find("OMX.google.") == 0) ||
-+                          (componentName.find("OMX.qcom.") == 0))) {
++                    if ((componentName.find(".encoder") == std::string::npos)
++                          && isSoftwareVideoDecoder(componentName)
++                          && !isAudioDecoder(componentName)) {
 +                        ++removeCounter;
 +                        continue;
 +                    }
