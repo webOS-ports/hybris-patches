@@ -6,8 +6,8 @@ Subject: [PATCH 4/5] (halium) add basic Halium build configuration based on
 
 Change-Id: I7ce0e771a5bdd0a94bd43af35bbfff3edc75dfd1
 ---
- target/product/halium.mk | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ target/product/halium.mk | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
  create mode 100644 target/product/halium.mk
 
 diff --git a/target/product/halium.mk b/target/product/halium.mk
@@ -37,7 +37,8 @@ index 0000000..166bf05
 +PRODUCT_PACKAGES += \
 +    fec \
 +    mke2fs \
-+    mkuserimg_mke2fs.sh
++    mkuserimg_mke2fs.sh \
++    mkimage
 +
 +# Halium-specific packages
 +PRODUCT_PACKAGES += \
