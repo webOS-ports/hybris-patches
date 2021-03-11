@@ -15,7 +15,7 @@ new file mode 100644
 index 0000000..166bf05
 --- /dev/null
 +++ b/target/product/halium.mk
-@@ -0,0 +1,39 @@
+@@ -0,0 +1,40 @@
 +# Required Android parts not included by embedded.mk
 +PRODUCT_PACKAGES += \
 +    android.system.net.netd@1.1-service.stub \
