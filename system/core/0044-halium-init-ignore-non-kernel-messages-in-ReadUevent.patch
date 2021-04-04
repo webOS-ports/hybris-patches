@@ -15,16 +15,26 @@ Change-Id: Ib7e4521899035e2dc67efaf27fc1bea13659efb4
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/init/uevent_listener.cpp b/init/uevent_listener.cpp
-index 1dc3097..01289eb 100644
+index 24b14c4..779288b 100644
 --- a/init/uevent_listener.cpp
 +++ b/init/uevent_listener.cpp
-@@ -96,7 +96,10 @@ bool UeventListener::ReadUevent(Uevent* uevent) const {
+@@ -96,7 +96,20 @@ bool UeventListener::ReadUevent(Uevent* uevent) const {
      char msg[UEVENT_MSG_LEN + 2];
      int n = uevent_kernel_multicast_recv(device_fd_, msg, UEVENT_MSG_LEN);
      if (n <= 0) {
 -        if (errno != EAGAIN && errno != EWOULDBLOCK) {
 +        if (errno == EIO) {
 +            // ignore non-kernel message (probably from udev) but keep processing events
++            uevent->partition_num = -1;
++            uevent->major = -1;
++            uevent->minor = -1;
++            uevent->action.clear();
++            uevent->path.clear();
++            uevent->subsystem.clear();
++            uevent->firmware.clear();
++            uevent->partition_name.clear();
++            uevent->device_name.clear();
++            
 +            return true;
 +        } else if (errno != EAGAIN && errno != EWOULDBLOCK) {
              LOG(ERROR) << "Error reading from Uevent Fd";
