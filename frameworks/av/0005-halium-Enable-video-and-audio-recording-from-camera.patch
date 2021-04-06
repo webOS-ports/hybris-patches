@@ -1,0 +1,352 @@
+From 28c1ae95f909fcc7edf32f5cbe8b7c7b33fa8914 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Thomas=20Vo=C3=9F?= <thomas.voss.bochum@gmail.com>
+Date: Thu, 11 Feb 2016 15:43:33 +0100
+Subject: [PATCH] (halium) Enable video and audio recording from camera.
+
+Signed-off-by: Ondrej Kubik <ondrej.kubik@canonical.com>
+
+Change-Id: I9f0c80bf75c0ee713d27fe4460e409cef51cd4c2
+---
+ media/libaudioclient/AudioRecord.cpp          | 112 +++++++-----------
+ .../libaudioclient/camera_record_service.cpp  |  21 ++--
+ .../include/media/camera_record_service.h     |  12 +-
+ 3 files changed, 69 insertions(+), 76 deletions(-)
+
+diff --git a/media/libaudioclient/AudioRecord.cpp b/media/libaudioclient/AudioRecord.cpp
+index fb19455ae..6bdf12fbd 100644
+--- a/media/libaudioclient/AudioRecord.cpp
++++ b/media/libaudioclient/AudioRecord.cpp
+@@ -358,7 +358,7 @@ status_t AudioRecord::set(
+     mMarkerReached = false;
+     mNewPosition = 0;
+     mUpdatePeriod = 0;
+-    AudioSystem::acquireAudioSessionId(mSessionId, -1);
++    // AudioSystem::acquireAudioSessionId(mSessionId, -1);
+     mSequence = 1;
+     mObservedSequence = mSequence;
+     mInOverrun = false;
+@@ -370,6 +370,8 @@ exit:
+     if (status != NO_ERROR) {
+         mMediaMetrics.markError(status, __FUNCTION__);
+     }
++
++    ALOGD("return status %d", status);
+     return status;
+ }
+ 
+@@ -408,6 +410,7 @@ status_t AudioRecord::start(AudioSystem::sync_event_t event, audio_session_t tri
+ 
+     status_t status = NO_ERROR;
+     if (!(flags & CBLK_INVALID)) {
++        ALOGV("mAudioRecord->start()");
+         status = mAudioRecord->start(event, triggerSession).transactionError();
+         if (status == DEAD_OBJECT) {
+             flags |= CBLK_INVALID;
+@@ -660,8 +663,6 @@ const char * AudioRecord::convertTransferToText(transfer_type transferType) {
+ // must be called with mLock held
+ status_t AudioRecord::createRecord_l(const Modulo<uint32_t> &epoch, const String16& opPackageName)
+ {
+-    IAudioFlinger::CreateRecordInput input;
+-    IAudioFlinger::CreateRecordOutput output;
+     audio_session_t originalSessionId;
+     sp<media::IAudioRecord> record;
+     void *iMemPointer;
+@@ -705,29 +706,8 @@ status_t AudioRecord::createRecord_l(const Modulo<uint32_t> &epoch, const String
+         }
+     }
+ 
+-    input.attr = mAttributes;
+-    input.config.sample_rate = mSampleRate;
+-    input.config.channel_mask = mChannelMask;
+-    input.config.format = mFormat;
+-    input.clientInfo.clientUid = mClientUid;
+-    input.clientInfo.clientPid = mClientPid;
+-    input.clientInfo.clientTid = -1;
+-    if (mFlags & AUDIO_INPUT_FLAG_FAST) {
+-        if (mAudioRecordThread != 0) {
+-            input.clientInfo.clientTid = mAudioRecordThread->getTid();
+-        }
+-    }
+-    input.opPackageName = opPackageName;
+-    input.riid = mTracker->getRiid();
+-
+-    input.flags = mFlags;
+-    // The notification frame count is the period between callbacks, as suggested by the client
+-    // but moderated by the server.  For record, the calculations are done entirely on server side.
+-    input.frameCount = mReqFrameCount;
+-    input.notificationFrameCount = mNotificationFramesReq;
+-    input.selectedDeviceId = mSelectedDeviceId;
+-    input.sessionId = mSessionId;
+-    originalSessionId = mSessionId;
++    // static audio_io_handle_t == 1
++    audio_io_handle_t input = 1;
+ 
+     // Initialize the input reader RecordThread:
+     status = recordService->initRecord(mSampleRate, mFormat, mChannelMask);
+@@ -736,41 +716,42 @@ status_t AudioRecord::createRecord_l(const Modulo<uint32_t> &epoch, const String
+         return status;
+     }
+ 
++    size_t frameCount = mReqFrameCount;
++    size_t temp = frameCount;   // temp may be replaced by a revised value of frameCount,
++                                // but we will still need the original value also
+     pid_t tid = -1;
+-    record = recordService->openRecord(mSampleRate, mFormat,
+-                                       mChannelMask,
+-                                       mFrameCount,
+-                                       tid,
+-                                       (int*)&mSessionId,
+-                                       &status);
+-
+-    if (record == 0 || status != NO_ERROR) {
++
++    // The notification frame count is the period between callbacks, as suggested by the server.
++    size_t notificationFrames = mNotificationFramesReq;
++
++    sp<IMemory> iMem;           // for cblk
++    sp<IMemory> bufferMem;
++
++    ICameraRecordService::Recording recording = recordService->openRecord(mSampleRate, mFormat,
++                                                                          mChannelMask,
++                                                                          frameCount,
++                                                                          tid,
++                                                                          (int*)&mSessionId,
++                                                                          &status);
++
++    if (recording.ar == 0 || status != NO_ERROR) {
+         ALOGE("CameraRecordService could not create record track, status: %d", status);
+         goto exit;
+     }
+-    ALOG_ASSERT(record != 0);
++
++    record = recording.ar;
++    iMem = recording.cblk;
++    bufferMem = recording.buffers;
+ 
+     // AudioFlinger now owns the reference to the I/O handle,
+     // so we are no longer responsible for releasing it.
+ 
+-    mAwaitBoost = false;
+-    if (output.flags & AUDIO_INPUT_FLAG_FAST) {
+-        ALOGI("%s(%d): AUDIO_INPUT_FLAG_FAST successful; frameCount %zu -> %zu",
+-              __func__, mPortId,
+-              mReqFrameCount, output.frameCount);
+-        mAwaitBoost = true;
+-    }
+-    mFlags = output.flags;
+-    mRoutedDeviceId = output.selectedDeviceId;
+-    mSessionId = output.sessionId;
+-    mSampleRate = output.sampleRate;
+-
+-    if (output.cblk == 0) {
++    if (iMem == 0) {
+         ALOGE("%s(%d): Could not get control block", __func__, mPortId);
+         status = NO_INIT;
+         goto exit;
+     }
+-    iMemPointer = output.cblk ->pointer();
++    iMemPointer = iMem->pointer();
+     if (iMemPointer == NULL) {
+         ALOGE("%s(%d): Could not get control block pointer", __func__, mPortId);
+         status = NO_INIT;
+@@ -782,10 +763,10 @@ status_t AudioRecord::createRecord_l(const Modulo<uint32_t> &epoch, const String
+     // The buffers are either immediately after the control block,
+     // or in a separate area at discretion of server.
+     void *buffers;
+-    if (output.buffers == 0) {
++    if (bufferMem == 0) {
+         buffers = cblk + 1;
+     } else {
+-        buffers = output.buffers->pointer();
++        buffers = bufferMem->pointer();
+         if (buffers == NULL) {
+             ALOGE("%s(%d): Could not get buffer pointer", __func__, mPortId);
+             status = NO_INIT;
+@@ -799,41 +780,40 @@ status_t AudioRecord::createRecord_l(const Modulo<uint32_t> &epoch, const String
+         mDeathNotifier.clear();
+     }
+     mAudioRecord = record;
+-    mCblkMemory = output.cblk;
+-    mBufferMemory = output.buffers;
++    mCblkMemory = iMem;
++    mBufferMemory = bufferMem;
+     IPCThreadState::self()->flushCommands();
+ 
+     mCblk = cblk;
+     // note that output.frameCount is the (possibly revised) value of mReqFrameCount
+-    if (output.frameCount < mReqFrameCount || (mReqFrameCount == 0 && output.frameCount == 0)) {
+-        ALOGW("%s(%d): Requested frameCount %zu but received frameCount %zu",
+-              __func__, output.portId,
+-              mReqFrameCount,  output.frameCount);
++    if (temp < frameCount || (frameCount == 0 && temp == 0)) {
++        ALOGW("%s: Requested frameCount %zu but received frameCount %zu",
++              __func__, frameCount,  temp);
+     }
++    frameCount = temp;
+ 
+     // Make sure that application is notified with sufficient margin before overrun.
+     // The computation is done on server side.
+-    if (mNotificationFramesReq > 0 && output.notificationFrameCount != mNotificationFramesReq) {
+-        ALOGW("%s(%d): Server adjusted notificationFrames from %u to %zu for frameCount %zu",
+-                __func__, output.portId,
+-                mNotificationFramesReq, output.notificationFrameCount, output.frameCount);
++    if (notificationFrames == 0 || notificationFrames > frameCount) {
++        ALOGW("%s: Received notificationFrames %zu for frameCount %zu",
++                __func__, notificationFrames, frameCount);
+     }
+-    mNotificationFramesAct = (uint32_t)output.notificationFrameCount;
++    mNotificationFramesAct = notificationFrames;
+ 
+     //mInput != input includes the case where mInput == AUDIO_IO_HANDLE_NONE for first creation
+     if (mDeviceCallback != 0) {
+         if (mInput != AUDIO_IO_HANDLE_NONE) {
+             AudioSystem::removeAudioDeviceCallback(this, mInput, mPortId);
+         }
+-        AudioSystem::addAudioDeviceCallback(this, output.inputId, output.portId);
++        AudioSystem::addAudioDeviceCallback(this, input, mPortId);
+     }
+ 
+-    mPortId = output.portId;
++    mPortId = 0;
+     // We retain a copy of the I/O handle, but don't own the reference
+-    mInput = output.inputId;
++    mInput = input;
+     mRefreshRemaining = true;
+ 
+-    mFrameCount = output.frameCount;
++    mFrameCount = frameCount;
+     // If IAudioRecord is re-created, don't let the requested frameCount
+     // decrease.  This can confuse clients that cache frameCount().
+     if (mFrameCount > mReqFrameCount) {
+diff --git a/media/libaudioclient/camera_record_service.cpp b/media/libaudioclient/camera_record_service.cpp
+index 9e0dabd02..4312bd676 100644
+--- a/media/libaudioclient/camera_record_service.cpp
++++ b/media/libaudioclient/camera_record_service.cpp
+@@ -59,7 +59,7 @@ status_t BpCameraRecordService::initRecord(
+     return remote()->transact(OPEN_RECORD, data, &reply);
+ }
+ 
+-sp<media::IAudioRecord> BpCameraRecordService::openRecord(uint32_t sampleRate,
++ICameraRecordService::Recording BpCameraRecordService::openRecord(uint32_t sampleRate,
+                             audio_format_t format,
+                             audio_channel_mask_t channelMask,
+                             size_t frameCount,
+@@ -71,6 +71,8 @@ sp<media::IAudioRecord> BpCameraRecordService::openRecord(uint32_t sampleRate,
+ 
+     Parcel data, reply;
+     sp<media::IAudioRecord> record;
++    sp<IMemory> memory;
++    sp<IMemory> buffers;
+     data.writeInterfaceToken(ICameraRecordService::getInterfaceDescriptor());
+     data.writeInt32(sampleRate);
+     data.writeInt32(format);
+@@ -88,6 +90,8 @@ sp<media::IAudioRecord> BpCameraRecordService::openRecord(uint32_t sampleRate,
+     else {
+         lStatus = reply.readInt32();
+         record = interface_cast<media::IAudioRecord>(reply.readStrongBinder());
++        memory = interface_cast<IMemory>(reply.readStrongBinder());
++        buffers = interface_cast<IMemory>(reply.readStrongBinder());
+         if (lStatus == NO_ERROR) {
+             if (record == 0) {
+                 ALOGE("openRecord should have returned an IAudioRecord instance");
+@@ -103,7 +107,7 @@ sp<media::IAudioRecord> BpCameraRecordService::openRecord(uint32_t sampleRate,
+     if (status)
+         *status = lStatus;
+ 
+-    return record;
++    return Recording{record, memory, buffers};
+ }
+ 
+ // ----------------------------------------------------------------------------
+@@ -143,13 +147,16 @@ status_t BnCameraRecordService::onTransact(uint32_t code, const Parcel& data,
+             pid_t tid = (pid_t) data.readInt32();
+             int sessionId = data.readInt32();
+             status_t status;
+-            sp<media::IAudioRecord> record = openRecord(sampleRate, format, channelMask,
++            Recording recording = openRecord(sampleRate, format, channelMask,
+                 frameCount, tid, &sessionId, &status);
+-            LOG_ALWAYS_FATAL_IF((record != 0) != (status == NO_ERROR));
++            LOG_ALWAYS_FATAL_IF((recording.ar != 0) != (status == NO_ERROR));
+ 
+             reply->writeInt32(sessionId);
+             reply->writeInt32(status);
+-            reply->writeStrongBinder(record->asBinder(record));
++            reply->writeStrongBinder(recording.ar->asBinder(recording.ar));
++            reply->writeStrongBinder(recording.cblk->asBinder(recording.cblk));
++            if (recording.buffers != NULL)
++                reply->writeStrongBinder(recording.buffers->asBinder(recording.buffers));
+             return NO_ERROR;
+         } break;
+         default:
+@@ -211,7 +218,7 @@ status_t CameraRecordService::initRecord(
+     return NO_ERROR;
+ }
+ 
+-sp<media::IAudioRecord> CameraRecordService::openRecord(uint32_t sampleRate,
++ICameraRecordService::Recording CameraRecordService::openRecord(uint32_t sampleRate,
+                             audio_format_t format,
+                             audio_channel_mask_t channelMask,
+                             size_t frameCount,
+@@ -273,7 +280,7 @@ Exit:
+     if (status) {
+         *status = lStatus;
+     }
+-    return recordHandle;
++    return Recording{recordHandle, recordTrack->getCblk(), NULL};
+ }
+ 
+ sp<CameraRecordService>& CameraRecordService::service_instance()
+diff --git a/media/libaudioclient/include/media/camera_record_service.h b/media/libaudioclient/include/media/camera_record_service.h
+index 8a4e7f585..eb544d1d6 100644
+--- a/media/libaudioclient/include/media/camera_record_service.h
++++ b/media/libaudioclient/include/media/camera_record_service.h
+@@ -21,6 +21,7 @@
+ 
+ #include "android/media/IAudioRecord.h"
+ #include <binder/IInterface.h>
++#include <binder/IMemory.h>
+ #include <binder/Parcel.h>
+ 
+ #include <system/audio.h>
+@@ -34,6 +35,11 @@ class RecordThread;
+ class ICameraRecordService : public IInterface
+ {
+ public:
++    struct Recording {
++        sp<media::IAudioRecord> ar;
++        sp<IMemory> cblk;
++        sp<IMemory> buffers;
++    };
+     DECLARE_META_INTERFACE(CameraRecordService);
+ 
+     static const char* exported_service_name() { return "android.media.ICameraRecordService"; }
+@@ -42,7 +48,7 @@ public:
+                                 uint32_t sampleRate,
+                                 audio_format_t format,
+                                 audio_channel_mask_t channelMask) = 0;
+-    virtual sp<media::IAudioRecord> openRecord(
++    virtual Recording openRecord(
+                                 uint32_t sampleRate,
+                                 audio_format_t format,
+                                 audio_channel_mask_t channelMask,
+@@ -78,7 +84,7 @@ public:
+                                 uint32_t sampleRate,
+                                 audio_format_t format,
+                                 audio_channel_mask_t channelMask);
+-    virtual sp<media::IAudioRecord> openRecord(
++    virtual Recording openRecord(
+                                 uint32_t sampleRate,
+                                 audio_format_t format,
+                                 audio_channel_mask_t channelMask,
+@@ -104,7 +110,7 @@ public:
+                                 uint32_t sampleRate,
+                                 audio_format_t format,
+                                 audio_channel_mask_t channelMask);
+-    virtual sp<media::IAudioRecord> openRecord(
++    virtual Recording openRecord(
+                                 uint32_t sampleRate,
+                                 audio_format_t format,
+                                 audio_channel_mask_t channelMask,
+-- 
+2.30.1
+
